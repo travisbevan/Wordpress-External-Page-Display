@@ -1,0 +1,50 @@
+/* External Page Display - Broadcast Styles */
+/* This CSS is embedded in the JavaScript embed code and does not need to be enqueued separately */
+
+#external-broadcast-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#external-broadcast-content h1,
+#external-broadcast-content h2,
+#external-broadcast-content h3,
+#external-broadcast-content h4,
+#external-broadcast-content h5,
+#external-broadcast-content h6,
+#external-broadcast-content .source-title {
+    text-align: center;
+}
+
+#external-broadcast-content .wp-block-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+#external-broadcast-content .source-content {
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 100%;
+}
+
+#external-broadcast-content .feature-image {
+    width: 100%;
+    max-width: 1200px;
+    height: auto;
+    margin: 0 auto 20px;
+    display: block;
+}
+
+#external-broadcast-content .source-article {
+    width: 100%;
+}
+
+#external-broadcast-content img {
+    max-width: 100%;
+    height: auto;
+}
