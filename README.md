@@ -1,4 +1,4 @@
-# Magazine Page Display
+# External Page Display
 
 A WordPress plugin that broadcasts page content to external websites with full WordPress/Gutenberg styling support.
 
