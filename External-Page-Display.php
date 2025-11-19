@@ -2,9 +2,11 @@
 /*
 Plugin Name: External Page Display
 Description: Adds a feature to select specific pages to broadcast content and provides an embed code for external sites.
-Version: 1.4
-Author: travisbevan.com
+Version: 1.5
+Author: Travis Bevan
+Author URI: https://travisbevan.com
 License: GPL2
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
 // Exit if accessed directly
@@ -32,6 +34,7 @@ function mpd_broadcast_meta_box_callback($post) {
     
     // Retrieve current value
     $broadcast = get_post_meta($post->ID, '_mpd_broadcast', true);
+    $embed_version = get_option('mpd_embed_version', '1.5');
     ?>
     <label for="mpd_broadcast">
         <input type="checkbox" name="mpd_broadcast" id="mpd_broadcast" value="1" <?php checked($broadcast, '1'); ?> />
@@ -39,96 +42,17 @@ function mpd_broadcast_meta_box_callback($post) {
     </label>
     <br />
     <?php if ($broadcast == '1'): ?>
-        <p style="margin-top: 15px;"><strong>Embed Code:</strong></p>
-        <p style="font-size: 12px; color: #666;">Copy and paste this code into any webpage to display this page's content:</p>
-        <textarea rows="10" style="width:100%; font-size: 11px; font-family: monospace;" readonly onclick="this.select();"><!-- external Page Display Embed -->
-<div id="external-broadcast-content"></div>
-<script type="text/javascript">
-(function() {
-    const pageId = "<?php echo esc_js($post->ID); ?>";
-    const apiUrl = "<?php echo esc_url(get_rest_url(null, 'external/v1/broadcast/')); ?>" + pageId;
-    
-    // Add CSS styles
-    const style = document.createElement('style');
-    style.textContent = `
-        #external-broadcast-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        #external-broadcast-content h1,
-        #external-broadcast-content h2,
-        #external-broadcast-content h3,
-        #external-broadcast-content h4,
-        #external-broadcast-content h5,
-        #external-broadcast-content h6,
-        #external-broadcast-content .source-title {
-            text-align: center;
-        }
-        #external-broadcast-content .wp-block-group {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            width: 100%;
-        }
-        #external-broadcast-content .source-content {
-            margin: 0 auto;
-            padding: 20px;
-            max-width: 100%;
-        }
-        #external-broadcast-content .feature-image {
-            width: 100%;
-            max-width: 1200px;
-            height: auto;
-            margin: 0 auto 20px;
-            display: block;
-        }
-        #external-broadcast-content .source-article {
-            width: 100%;
-        }
-        #external-broadcast-content img {
-            max-width: 100%;
-            height: auto;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Fetch and display content
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Content not available');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data && data.title && data.content) {
-                const featureImage = data.feature_image ? 
-                    `<img src="${data.feature_image}" alt="Feature Image" class="feature-image">` : "";
-                document.getElementById("external-broadcast-content").innerHTML = `
-                    <div class="source-article">
-                        ${featureImage}
-                        <h1 class="source-title">${data.title}</h1>
-                        <div class="source-content">${data.content}</div>
-                    </div>
-                `;
-            } else {
-                document.getElementById("external-broadcast-content").innerHTML = 
-                    "<p>No content found.</p>";
-            }
-        })
-        .catch(error => {
-            console.error('external Display Error:', error);
-            document.getElementById("external-broadcast-content").innerHTML = 
-                "<p>Error loading content. Please try again later.</p>";
-        });
-})();
-</script>
-<!-- End External Page Display Embed --></textarea>
-        <p style="font-size: 12px; color: #666; margin-top: 10px;">
-            <strong>Note:</strong> The page must remain published and the "Broadcast" checkbox must stay checked for the embed to work.
+        <p style="margin-top: 15px;"><strong>Embed Code (v<?php echo esc_html($embed_version); ?>):</strong></p>
+        <p style="font-size: 12px; color: #666;">Copy and paste this code into any webpage:</p>
+        <textarea rows="6" style="width:100%; font-size: 11px; font-family: monospace;" readonly onclick="this.select();"><!-- Magazine Page Display Embed -->
+<div id="magazine-broadcast-content"></div>
+<script src="<?php echo esc_url(plugins_url('embed.js', __FILE__)); ?>?page=<?php echo esc_attr($post->ID); ?>&api=<?php echo urlencode(get_rest_url(null, 'magazine/v1/broadcast/')); ?>&v=<?php echo esc_attr($embed_version); ?>"></script>
+<!-- End Magazine Page Display Embed --></textarea>
+        <p style="font-size: 12px; color: #0073aa; margin-top: 10px;">
+            <strong>✨ New in v1.5:</strong> External JavaScript file means plugin updates work automatically - no need to update embed codes!
+        </p>
+        <p style="font-size: 12px; color: #666; margin-top: 5px;">
+            The page must remain published and broadcasted for the embed to work.
         </p>
     <?php endif; ?>
     <?php
@@ -136,27 +60,22 @@ function mpd_broadcast_meta_box_callback($post) {
 
 // Save the broadcast setting
 function mpd_save_broadcast_meta($post_id) {
-    // Check if nonce is set
     if (!isset($_POST['mpd_broadcast_nonce'])) {
         return;
     }
     
-    // Verify nonce
     if (!wp_verify_nonce($_POST['mpd_broadcast_nonce'], 'mpd_broadcast_nonce_action')) {
         return;
     }
     
-    // Check if this is an autosave
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
         return;
     }
     
-    // Check user permissions
     if (!current_user_can('edit_post', $post_id)) {
         return;
     }
     
-    // Save or delete the broadcast setting
     if (isset($_POST['mpd_broadcast'])) {
         update_post_meta($post_id, '_mpd_broadcast', '1');
     } else {
@@ -165,12 +84,12 @@ function mpd_save_broadcast_meta($post_id) {
 }
 add_action('save_post', 'mpd_save_broadcast_meta');
 
-// Register REST API endpoint for broadcasted pages
+// Register REST API endpoint
 add_action('rest_api_init', function() {
-    register_rest_route('external/v1', '/broadcast/(?P<page_id>\d+)', array(
+    register_rest_route('magazine/v1', '/broadcast/(?P<page_id>\d+)', array(
         'methods' => 'GET',
         'callback' => 'mpd_get_broadcast_content',
-        'permission_callback' => '__return_true', // Public endpoint
+        'permission_callback' => '__return_true',
         'args' => array(
             'page_id' => array(
                 'validate_callback' => function($param) {
@@ -186,7 +105,6 @@ function mpd_get_broadcast_content($data) {
     $page_id = (int) $data['page_id'];
     $page = get_post($page_id);
 
-    // Check if page exists, is published, and is marked for broadcast
     if (!$page || $page->post_status !== 'publish' || get_post_meta($page_id, '_mpd_broadcast', true) != '1') {
         return new WP_Error(
             'not_found', 
@@ -195,26 +113,67 @@ function mpd_get_broadcast_content($data) {
         );
     }
 
-    // Return sanitized content
+    // Get content and ensure links open in new tabs
+    $content = apply_filters('the_content', $page->post_content);
+    $content = mpd_fix_links($content);
+
     return array(
         'title'   => wp_kses_post($page->post_title),
-        'content' => apply_filters('the_content', $page->post_content),
+        'content' => $content,
         'feature_image' => get_the_post_thumbnail_url($page_id, 'full') ?: '',
+        'version' => '1.5',
     );
 }
 
-// Add admin notices for feedback
+// Fix links to open in new tabs and preserve onclick
+function mpd_fix_links($content) {
+    // Add target="_blank" to all links without it
+    $content = preg_replace_callback(
+        '/<a\s+([^>]*?)>/i',
+        function($matches) {
+            $attrs = $matches[1];
+            
+            // Only modify if href exists
+            if (stripos($attrs, 'href=') === false) {
+                return $matches[0];
+            }
+            
+            // Add target if missing
+            if (stripos($attrs, 'target=') === false) {
+                $attrs .= ' target="_blank"';
+            }
+            
+            // Add rel if missing
+            if (stripos($attrs, 'rel=') === false) {
+                $attrs .= ' rel="noopener noreferrer"';
+            }
+            
+            return '<a ' . trim($attrs) . '>';
+        },
+        $content
+    );
+    
+    return $content;
+}
+
+// Add admin notices
 function mpd_admin_notices() {
     $screen = get_current_screen();
-    if ($screen->id === 'page' && isset($_GET['message']) && $_GET['message'] == 1) {
+    if ($screen && $screen->id === 'page' && isset($_GET['message']) && $_GET['message'] == 1) {
         $post_id = isset($_GET['post']) ? (int) $_GET['post'] : 0;
         if ($post_id && get_post_meta($post_id, '_mpd_broadcast', true) == '1') {
             ?>
             <div class="notice notice-info is-dismissible">
-                <p><strong>external Page Display:</strong> This page is now available for broadcast. Check the sidebar for the embed code.</p>
+                <p><strong>Magazine Page Display:</strong> This page is now available for broadcast. Check the sidebar for the embed code.</p>
             </div>
             <?php
         }
     }
 }
 add_action('admin_notices', 'mpd_admin_notices');
+
+// Set version on activation
+function mpd_activate() {
+    update_option('mpd_embed_version', '1.5');
+}
+register_activation_hook(__FILE__, 'mpd_activate');
