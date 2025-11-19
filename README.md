@@ -40,14 +40,14 @@ A WordPress plugin that broadcasts page content to external websites with full W
 ### Manual Installation
 
 1. Download or clone this repository
-2. Upload the `magazine-page-display` folder to `/wp-content/plugins/`
+2. Upload the `external-page-display` folder to `/wp-content/plugins/`
 3. Activate the plugin through the **Plugins** menu in WordPress
 
 ### From GitHub
 
 ```bash
 cd /path/to/wordpress/wp-content/plugins/
-git clone https://github.com/yourusername/magazine-page-display.git
+git clone https://github.com/yourusername/external-page-display.git
 ```
 
 Then activate the plugin in WordPress admin.
@@ -67,10 +67,10 @@ Then activate the plugin in WordPress admin.
 Paste the embed code into any HTML page:
 
 ```html
-<!-- Magazine Page Display Embed -->
-<div id="magazine-broadcast-content"></div>
-<script src="https://yoursite.com/wp-content/plugins/magazine-page-display/embed.js?page=123&api=https%3A%2F%2Fyoursite.com%2Fwp-json%2Fmagazine%2Fv1%2Fbroadcast%2F&v=1.5"></script>
-<!-- End Magazine Page Display Embed -->
+<!-- External Page Display Embed -->
+<div id="external-broadcast-content"></div>
+<script src="https://yoursite.com/wp-content/plugins/external-page-display/embed.js?page=123&api=https%3A%2F%2Fyoursite.com%2Fwp-json%2Fexternal%2Fv1%2Fbroadcast%2F&v=1.5"></script>
+<!-- End External Page Display Embed -->
 ```
 
 The content will automatically load with full WordPress styling!
@@ -102,7 +102,7 @@ v1.5 includes full styling support for:
 The plugin registers a public REST API endpoint:
 
 ```
-GET /wp-json/magazine/v1/broadcast/{page_id}
+GET /wp-json/External/v1/broadcast/{page_id}
 ```
 
 **Response:**
@@ -119,15 +119,15 @@ GET /wp-json/magazine/v1/broadcast/{page_id}
 
 ### Override Styles
 
-All content is wrapped in `#magazine-broadcast-content`. Add custom CSS:
+All content is wrapped in `#External-broadcast-content`. Add custom CSS:
 
 ```css
-#magazine-broadcast-content {
+#External-broadcast-content {
     max-width: 900px;
     /* Your custom styles */
 }
 
-#magazine-broadcast-content .wp-block-button__link {
+#External-broadcast-content .wp-block-button__link {
     background-color: #your-color;
 }
 ```
@@ -174,7 +174,7 @@ A: Yes! v1.5 includes all necessary WordPress/Gutenberg CSS in the embed.
 A: Yes! This was the main fix in v1.5 - full block styling support.
 
 **Q: Can I customize the appearance?**  
-A: Yes, use `#magazine-broadcast-content` to target and override styles.
+A: Yes, use `#External-broadcast-content` to target and override styles.
 
 **Q: What happens if I disable broadcasting?**  
 A: The embed shows an error message and stops displaying content.
@@ -187,7 +187,7 @@ A: Yes, v1.5 automatically adds `target="_blank"` to all links.
 ### Content Not Loading
 1. Verify page is **Published** (not Draft)
 2. Check **broadcast checkbox is checked**
-3. Test API URL directly: `https://yoursite.com/wp-json/magazine/v1/broadcast/[PAGE_ID]`
+3. Test API URL directly: `https://yoursite.com/wp-json/external/v1/broadcast/[PAGE_ID]`
 4. Check browser console for errors (F12)
 
 ### Columns/Buttons Not Styled
@@ -205,7 +205,7 @@ A: Yes, v1.5 automatically adds `target="_blank"` to all links.
 For bugs, features, or questions:
 - Check [UPDATE-TO-v1.5.md](UPDATE-TO-v1.5.md) for upgrade info
 - Review [TESTING.md](TESTING.md) for troubleshooting
-- Open an issue on [GitHub](https://github.com/yourusername/magazine-page-display/issues)
+- Open an issue on [GitHub](https://github.com/yourusername/external-page-display/issues)
 
 ## Changelog
 
@@ -230,7 +230,7 @@ For bugs, features, or questions:
 This plugin is licensed under GPL v2 or later.
 
 ```
-Magazine Page Display
+External Page Display
 Copyright (C) 2024
 
 This program is free software; you can redistribute it and/or modify
